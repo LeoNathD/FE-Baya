@@ -1,0 +1,47 @@
+import { handleError } from "@/helpers/errorHelper";
+import { axiosInstance } from "@/plugins/axios";
+import { defineStore } from "pinia";
+
+export const useProductCategoryStore = defineStore("productCategory", {
+    state: () => ({
+        productCategories: [],
+        meta: {
+            current_page: 1,
+            last_page: 1,
+            per_page: 10,
+            total: 0,
+        },
+        loading: false,
+        error: null,
+        success: null,
+    }),
+    actions: {
+        async fetchProductCategories(params) {
+            this.loading = true
+
+            try{
+                const response = await axiosInstance.get(`product-category`, { params })
+
+                this.productCategories = response.data.data
+            } catch(error) {
+                this.error = handleError(error)
+            } finally {
+                this.loading = false
+            }
+        },
+
+        async fetchProductCategoryBySlug(slug) {
+            this.loading = true
+
+            try {
+                const   response = await axiosInstance.get(`product-category/slug/${slug}`)
+
+                return response.data.data
+            } catch (error) {
+                this.error = handleError(error)
+            } finally {
+                this.loading = false
+            }
+        }
+    }
+});
